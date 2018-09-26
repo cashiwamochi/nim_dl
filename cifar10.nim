@@ -80,8 +80,8 @@ proc read_cifar10*(cifar10_dir: string, file_names: seq[string]): cifar10Temp =
   # shuffle(r,cifar10_image_patches)
   # shuffle(r,cifar10_labels)
 
-  result.images = cifar10_image_patches[0 .. 20000].toTensor()
-  result.labels = cifar10_labels[0 .. 20000].toTensor()
+  result.images = cifar10_image_patches.toTensor()
+  result.labels = cifar10_labels.toTensor()
 
 proc load_cifar10*(cifar10_dir: string): cifar10 =
   if not checkCifarExist(cifar10_dir, CIFAR10Filenames):
