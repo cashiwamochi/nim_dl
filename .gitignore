@@ -5,3 +5,4 @@ demoCifar10
 .vs_code
 .DS_Store
 *.csv
+log

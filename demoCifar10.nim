@@ -10,13 +10,14 @@ import cifar10
 echo "||================================= Cifar-10 (Nim) ================================= "
 let
   root_path : string = os.getAppDir()
-  now: TimeInfo = getLocalTime(getTime())
+  now = getLocalTime(getTime())
   data = loadCifar10(root_path & "/cifar10")
   x_train = data.train_images.astype(float32) / 255.0'f32
   y_train = data.train_labels.astype(int)
   x_test = data.test_images.astype(float32) / 255.0'f32
   y_test = data.test_labels.astype(int)
 
+createDir(root_path & "/log")
 var log_content = "epoch, accuracy, val-loss, train-loss \n"
 
 randomize(777) # Random seed for reproducibility
@@ -35,11 +36,11 @@ let
 network ctx, DemoNet:
   layers:
     x:          Input([c, h, w])
-    cv1:        Conv2D(x.out_shape, 20, 3, 3)
+    cv1:        Conv2D(x.out_shape, 30, 3, 3)
     mp1:        MaxPool2D(cv1.out_shape, (2,2), (0,0), (2,2))
-    cv2:        Conv2D(mp1.out_shape, 50, 3, 3)
+    cv2:        Conv2D(mp1.out_shape, 60, 3, 3)
     mp2:        MaxPool2D(cv2.out_shape, (2,2), (0,0), (2,2))
-    cv3:        Conv2D(mp2.out_shape, 80, 3, 3)
+    cv3:        Conv2D(mp2.out_shape, 100, 3, 3)
     mp3:        MaxPool2D(cv3.out_shape, (2,2), (0,0), (2,2))
     fl:         Flatten(mp3.out_shape)
     hidden:     Linear(fl.out_shape, 500)
@@ -95,4 +96,7 @@ for epoch in 0 ..< 500:
 
     log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
 
-writeFile(root_path & "/" & $now.hour & $now.minute & $now.second & ".csv", log_content)
+  if epoch mod 50 == 0:
+    writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & $epoch & ".csv", log_content)
+
+writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_last.csv", log_content)
