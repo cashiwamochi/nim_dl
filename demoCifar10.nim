@@ -1,23 +1,25 @@
 import os
 import streams, sequtils
-import math, random
+import math, random, times
 import arraymancer
-
+import parsecsv
 import cifar10
+
 
 # main
 echo "||================================= Cifar-10 (Nim) ================================= "
 let
   root_path : string = os.getAppDir()
+  now: TimeInfo = getLocalTime(getTime())
   data = loadCifar10(root_path & "/cifar10")
   x_train = data.train_images.astype(float32) / 255.0'f32
   y_train = data.train_labels.astype(int)
   x_test = data.test_images.astype(float32) / 255.0'f32
   y_test = data.test_labels.astype(int)
 
-echo "|| Arraymancer environment is being arranged ... "
+var log_content = "epoch, accuracy, val-loss, train-loss \n"
 
-randomize(8) # Random seed for reproducibility
+randomize(777) # Random seed for reproducibility
 
 let
   ctx = newContext Tensor[float32] # Autograd/neural network graph
@@ -51,8 +53,9 @@ let
 
 # Learning loop
 echo "|| Learning Start !"
-for epoch in 0 ..< 30:
+for epoch in 0 ..< 500:
   # Back-Propagation-Part
+  var sum_train_loss = 0.0
   for batch_id in 0 ..< data.train_images.shape[0] div n:
     let 
       offset = batch_id * n
@@ -61,25 +64,35 @@ for epoch in 0 ..< 30:
       clf = model.forward(batch_data_x)
       loss = clf.sparse_softmax_cross_entropy(batch_data_y)
 
+    sum_train_loss = sum_train_loss + loss.value.data[0]
+
+    discard """
     if batch_id mod 100 == 0:
       echo "|| Epoch is: " & $epoch
       echo "|| Batch id: " & $batch_id
       echo "|| Loss is:  " & $loss.value.data[0]
-
+    """
     loss.backprop()
     optim.update()
 
   # Validation
   ctx.no_grad_mode:
-    echo "|| Epoch #" & $epoch & " done. Testing accuracy"
 
-    var score = 0.0
-    var loss = 0.0
+    var 
+      score = 0.0
+      loss = 0.0
     for i in 0 ..< 100:
       let y_pred = model.forward(X_test[i*100 ..< (i+1)*100]).value.softmax.argmax(axis = 1).squeeze
       score += accuracy_score(y_test[i*100 ..< (i+1)*100], y_pred)
       loss += model.forward(X_test[i*100 ..< (i+1)*100]).sparse_softmax_cross_entropy(y_test[i*100 ..< (i+1)*100]).value.data[0]
     score /= 100.0
     loss /= 100.0
-    echo "|| Accuracy: " & $(score * 100.0) & "%"
-    echo "|| Loss:     " & $loss
+
+    echo "||############## Epoch " & $epoch & " done. ##############"
+    echo "|| Accuracy:     " & $(score * 100.0) & "%"
+    echo "|| Val-Loss:     " & $loss
+    echo "|| Train-Loss:   " & $(sum_train_loss / float(data.train_images.shape[0] div n))
+
+    log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
+
+writeFile(root_path & "/" & $now.hour & $now.minute & $now.second & ".csv", log_content)
