@@ -20,7 +20,7 @@ let
 createDir(root_path & "/log")
 var log_content = "epoch, accuracy, val-loss, train-loss \n"
 
-randomize(777) # Random seed for reproducibility
+randomize(777)
 
 let
   ctx = newContext Tensor[float32] # Autograd/neural network graph
@@ -36,17 +36,17 @@ let
 network ctx, DemoNet:
   layers:
     x:          Input([c, h, w])
-    cv1:        Conv2D(x.out_shape, 30, 3, 3)
-    mp1:        MaxPool2D(cv1.out_shape, (2,2), (0,0), (2,2))
-    cv2:        Conv2D(mp1.out_shape, 60, 3, 3)
-    mp2:        MaxPool2D(cv2.out_shape, (2,2), (0,0), (2,2))
-    cv3:        Conv2D(mp2.out_shape, 100, 3, 3)
-    mp3:        MaxPool2D(cv3.out_shape, (2,2), (0,0), (2,2))
-    fl:         Flatten(mp3.out_shape)
+    cv1_1:      Conv2D(x.out_shape, 32, 3, 1)
+    cv1_2:      Conv2D(cv1_1.outshape, 32, 3, 1)
+    mp1:        MaxPool2D(cv1_2.outshape, (2,2), (0,0), (2,2))
+    cv2_1:      Conv2D(mp1.out_shape, 64, 3, 1)
+    cv2_2:      Conv2D(cv2_1.out_shape, 64, 3, 1)
+    mp2:        MaxPool2D(cv2_2.outshape, (2,2), (0,0), (2,2))
+    fl:         Flatten(mp2.out_shape)
     hidden:     Linear(fl.out_shape, 500)
     classifier: Linear(500, 10)
   forward x:
-    x.cv1.relu.mp1.cv2.relu.mp2.cv3.relu.mp3.fl.hidden.relu.classifier
+    x.cv1_1.relu.cv1_2.relu.mp1.cv2_1.relu.cv2_2.relu.mp2.fl.hidden.relu.classifier
 
 let 
   model = ctx.init(DemoNet)
@@ -97,6 +97,6 @@ for epoch in 0 ..< 500:
     log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
 
   if epoch mod 50 == 0:
-    writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & $epoch & ".csv", log_content)
+    writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_" & $epoch & ".csv", log_content)
 
 writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_last.csv", log_content)

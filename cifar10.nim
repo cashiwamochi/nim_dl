@@ -52,7 +52,8 @@ proc read_cifar10*(cifar10_dir: string, file_names: seq[string]): cifar10Temp =
         col_idx = 0 # 0 - 3072
         row_idx = 0 # 0 - 9999
       let
-        offset = num_data_in_row*file_idx
+        # offset = num_data_in_row*file_idx
+        offset = num_patches_in_file*file_idx
       while not fs.atEnd:
         let value : uint8 = fs.readUint8()
         if col_idx == 0: # 0
@@ -76,6 +77,7 @@ proc read_cifar10*(cifar10_dir: string, file_names: seq[string]): cifar10Temp =
       assert row_idx == num_patches_in_file
     fs.close()
   
+  # This shuffle makes the performance better
   randomize(7)
   shuffle(cifar10_image_patches)
   randomize(7)
