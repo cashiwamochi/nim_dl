@@ -42,7 +42,7 @@ proc checkCifarExist(cifar_dir: string, cifar_file_names: array[0..5, string]) :
 
 proc read_cifar10*(cifar10_dir: string, file_names: seq[string]): cifar10Temp = 
   var
-    cifar10_image_patches = newSeq[patchImageData](10000*len(file_names)) # batch * c * h * w
+    cifar10_image_patches = newSeq[patchImageData](10000*len(file_names)) # patch * c * h * w
     cifar10_labels = newSeq[uint8](10000*len(file_names)) # batch * 1
 
   for file_idx, file_name in file_names:
@@ -78,9 +78,9 @@ proc read_cifar10*(cifar10_dir: string, file_names: seq[string]): cifar10Temp =
     fs.close()
   
   # This shuffle makes the performance better
-  randomize(7)
+  randomize(1)
   shuffle(cifar10_image_patches)
-  randomize(7)
+  randomize(1)
   shuffle(cifar10_labels)
 
   result.images = cifar10_image_patches.toTensor()

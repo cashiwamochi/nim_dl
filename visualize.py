@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
   if len(sys.argv) != 2:
-    print("usage : python3 this.py [/path/to/your_log.csv]")
+    print("usage : python3 visualize.py [/path/to/your_log.csv]")
     quit()
 
   file_name = sys.argv[1]

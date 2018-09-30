@@ -5,7 +5,6 @@ import arraymancer
 import parsecsv
 import cifar10
 
-
 # main
 echo "||================================= Cifar-10 (Nim) ================================= "
 let
@@ -20,7 +19,7 @@ let
 createDir(root_path & "/log")
 var log_content = "epoch, accuracy, val-loss, train-loss \n"
 
-randomize(777)
+randomize(111)
 
 let
   ctx = newContext Tensor[float32] # Autograd/neural network graph
@@ -54,7 +53,7 @@ let
 
 # Learning loop
 echo "|| Learning Start !"
-for epoch in 0 ..< 500:
+for epoch in 0 ..< 1000:
   # Back-Propagation-Part
   var sum_train_loss = 0.0
   for batch_id in 0 ..< data.train_images.shape[0] div n:
@@ -63,9 +62,9 @@ for epoch in 0 ..< 500:
       batch_data_x = X_train[offset ..< offset+n]
       batch_data_y = y_train[offset ..< offset+n]
       clf = model.forward(batch_data_x)
-      loss = clf.sparse_softmax_cross_entropy(batch_data_y)
+      train_loss = clf.sparse_softmax_cross_entropy(batch_data_y)
 
-    sum_train_loss = sum_train_loss + loss.value.data[0]
+    sum_train_loss = sum_train_loss + train_loss.value.data[0]
 
     discard """
     if batch_id mod 100 == 0:
@@ -73,7 +72,8 @@ for epoch in 0 ..< 500:
       echo "|| Batch id: " & $batch_id
       echo "|| Loss is:  " & $loss.value.data[0]
     """
-    loss.backprop()
+
+    train_loss.backprop()
     optim.update()
 
   # Validation
@@ -81,20 +81,20 @@ for epoch in 0 ..< 500:
 
     var 
       score = 0.0
-      loss = 0.0
+      val_loss = 0.0
     for i in 0 ..< 100:
       let y_pred = model.forward(X_test[i*100 ..< (i+1)*100]).value.softmax.argmax(axis = 1).squeeze
       score += accuracy_score(y_test[i*100 ..< (i+1)*100], y_pred)
-      loss += model.forward(X_test[i*100 ..< (i+1)*100]).sparse_softmax_cross_entropy(y_test[i*100 ..< (i+1)*100]).value.data[0]
+      val_loss += model.forward(X_test[i*100 ..< (i+1)*100]).sparse_softmax_cross_entropy(y_test[i*100 ..< (i+1)*100]).value.data[0]
     score /= 100.0
-    loss /= 100.0
+    val_loss /= 100.0
 
     echo "||############## Epoch " & $epoch & " done. ##############"
     echo "|| Accuracy:     " & $(score * 100.0) & "%"
-    echo "|| Val-Loss:     " & $loss
+    echo "|| Val-Loss:     " & $val_loss
     echo "|| Train-Loss:   " & $(sum_train_loss / float(data.train_images.shape[0] div n))
 
-    log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
+    log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $val_loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
 
   if epoch mod 50 == 0:
     writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_" & $epoch & ".csv", log_content)
