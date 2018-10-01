@@ -29,6 +29,6 @@ if __name__ == "__main__":
 
   h1, l1 = ax1.get_legend_handles_labels()
   h2, l2 = ax2.get_legend_handles_labels()
-  ax2.legend(h1+h2, l1+l2)
+  ax2.legend(h1+h2, l1+l2,loc='upper left')
 
   plt.show()
