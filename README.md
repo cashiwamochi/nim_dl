@@ -13,3 +13,8 @@ While training, csv files which include accuracy, val-loss, and train-loss are s
 python3 visualize.py ./log/23481250.csv # example
 # csv-name = [start-time(hour,minute,secound) + epoch].csv
 ```
+This fig shows the performance of the current model. The accuracy can be improved of course.
+<img src="https://github.com/cashiwamochi/nim_dl/blob/master/img/fig.png" width="500">
+
+This implementation works on my MBP(2013-Late, HighSierra).
+If you are interested in this, please try to get better models.
