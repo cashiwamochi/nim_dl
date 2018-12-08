@@ -16,7 +16,7 @@ python3 visualize.py ./log/23481250.csv # example
 This fig shows the performance of the current model. The accuracy can be improved of course.
 <img src="https://github.com/cashiwamochi/nim_dl/blob/master/img/fig.png" width="500">
 
-This implementation works on my MBP(2013-Late, HighSierra).   
-Nim -> v0.19.0   
+This implementation works on my MBP(2013-Late, HighSierra) and Ubuntu18.   
+Nim -> 0.19.0   
 Arraymancer -> 0.4.0   
 If you are interested in this, please try to get better models.
