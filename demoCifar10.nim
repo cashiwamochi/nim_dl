@@ -36,10 +36,10 @@ network ctx, DemoNet:
   layers:
     x:          Input([c, h, w])
     cv1_1:      Conv2D(x.out_shape, 32, 3, 1)
-    cv1_2:      Conv2D(cv1_1.outshape, 32, 3, 1)
+    cv1_2:      Conv2D(cv1_1.outshape, 32, 3, 2)
     mp1:        MaxPool2D(cv1_2.outshape, (2,2), (0,0), (2,2))
     cv2_1:      Conv2D(mp1.out_shape, 64, 3, 1)
-    cv2_2:      Conv2D(cv2_1.out_shape, 64, 3, 1)
+    cv2_2:      Conv2D(cv2_1.out_shape, 64, 3, 2)
     mp2:        MaxPool2D(cv2_2.outshape, (2,2), (0,0), (2,2))
     fl:         Flatten(mp2.out_shape)
     hidden:     Linear(fl.out_shape, 500)
@@ -49,12 +49,20 @@ network ctx, DemoNet:
 
 let 
   model = ctx.init(DemoNet)
-  optim = model.optimizerSGD(learning_rate = 0.001'f32)
+var 
+  optim = model.optimizerSGD(learning_rate = 0.01'f32)
 
 # Learning loop
 echo "|| Learning Start !"
-for epoch in 0 ..< 1000:
+for epoch in 0 .. 20:
   # Back-Propagation-Part
+  if epoch == 5:
+      optim = model.optimizerSGD(learning_rate = 0.006'f32)
+  elif epoch == 10:
+      optim = model.optimizerSGD(learning_rate = 0.002'f32)
+  elif epoch == 15:
+      optim = model.optimizerSGD(learning_rate = 0.001'f32)
+
   var sum_train_loss = 0.0
   for batch_id in 0 ..< data.train_images.shape[0] div n:
     let 
@@ -96,7 +104,7 @@ for epoch in 0 ..< 1000:
 
     log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $val_loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
 
-  if epoch mod 50 == 0:
+  if epoch mod 10 == 0:
     writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_" & $epoch & ".csv", log_content)
 
 writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_last.csv", log_content)

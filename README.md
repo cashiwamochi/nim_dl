@@ -18,5 +18,9 @@ This fig shows the performance of the current model. The accuracy can be improve
 
 This implementation works on my MBP(2013-Late, HighSierra).   
 Nim -> v0.19.0   
-Arraymancer -> 0.4.0   
+Arraymancer -> 0.5.0   
 If you are interested in this, please try to get better models.
+
+### Note
+The performance of Arraymancer v0.4.0 is not good, but the performance of Arraymancer v0.5.0 is better.    
+You should use newer Arraymancer.

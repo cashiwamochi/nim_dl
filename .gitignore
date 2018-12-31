@@ -6,3 +6,5 @@ demoCifar10
 .DS_Store
 *.csv
 log
+
+cifar-10-binary.tar.gz
