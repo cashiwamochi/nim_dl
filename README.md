@@ -24,7 +24,7 @@ Arraymancer -> v0.5.0. This versrion looks working correclty.
 <img src="https://github.com/cashiwamochi/nim_dl/blob/master/img/fig050.png" width="500">
 
 
-This implementation works on my MBP(2013-Late, HighSierra).   
+This implementation works on my MBP(2013-Late, HighSierra) and Ubuntu18.   
 Nim -> v0.19.0   
 Arraymancer -> 0.5.0 or (0.4.0)   
 If you are interested in this, please try to get better models.
