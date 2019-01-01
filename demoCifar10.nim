@@ -57,7 +57,7 @@ echo "|| Learning Start !"
 for epoch in 0 .. 20:
   # Back-Propagation-Part
   if epoch == 5:
-      optim = model.optimizerSGD(learning_rate = 0.006'f32)
+      optim = model.optimizerSGD(learning_rate = 0.005'f32)
   elif epoch == 10:
       optim = model.optimizerSGD(learning_rate = 0.002'f32)
   elif epoch == 15:
@@ -104,7 +104,7 @@ for epoch in 0 .. 20:
 
     log_content = log_content & $epoch & "," & $(score * 100.0) & "," & $val_loss & "," & $(sum_train_loss / float(data.train_images.shape[0] div n)) & "\n"
 
-  if epoch mod 10 == 0:
+  if epoch mod 2 == 0:
     writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_" & $epoch & ".csv", log_content)
 
 writeFile(root_path & "/log/" & $now.hour & $now.minute & $now.second & "_last.csv", log_content)

@@ -77,11 +77,10 @@ proc read_cifar10*(cifar10_dir: string, file_names: seq[string]): cifar10Temp =
       assert row_idx == num_patches_in_file
     fs.close()
   
-  # This shuffle makes the performance better
   randomize(1)
-  # shuffle(cifar10_image_patches)
+  shuffle(cifar10_image_patches)
   randomize(1)
-  # shuffle(cifar10_labels)
+  shuffle(cifar10_labels)
 
   result.images = cifar10_image_patches.toTensor()
   result.labels = cifar10_labels.toTensor()
